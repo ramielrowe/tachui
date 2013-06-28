@@ -36,7 +36,6 @@ function clear_session(do_refresh){
         url: "api/session",
         dataType: "html"
     }).done(function( msg ) {
-        alert( "Cleared" );
         if(do_refresh){
             refresh();
         }
@@ -64,7 +63,7 @@ function stacky_watch(){
     }).done(function( msg ) {
             var watch_table = $('#watch_table tbody')
             watch_table.prepend(msg);
-            watch_table.children("tr:gt(30)").remove()
+            watch_table.children("tr:gt(60)").remove()
         });
 
 }
@@ -104,5 +103,17 @@ function do_search(){
     }).done(function( msg ) {
             var search_table = $('#search_table tbody')
             search_table.html(msg)
+        });
+}
+
+function show_event(loc, id){
+    $.ajax({
+        type: "GET",
+        url: "api/stacky/show/"+loc+"/"+id,
+        dataType: "html"
+    }).done(function( msg ) {
+            var row = $('#s_'+loc+'_'+id);
+            row.after(msg)
+            $("html, body").animate({ scrollTop: $('#s_'+loc+'_'+id+'_show').offset().top }, 500);
         });
 }

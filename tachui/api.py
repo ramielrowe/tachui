@@ -69,16 +69,16 @@ def stacky_reports(request, deployments=None):
 
 @util.api_call
 @util.session_deployments
-def stacky_watch(request, deployments):
+def stacky_watch(request, deployments=None):
     if request.method == 'DELETE':
-        start = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        start = datetime.datetime.now() - datetime.timedelta(minutes=1)
         for name in deployments:
             request.session['%s-last' % name] = time.mktime(start.timetuple())
 
     if request.method == 'GET':
         events = []
         deps = models.Deployment.objects.filter(name__in=deployments)
-        start = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        start = datetime.datetime.now() - datetime.timedelta(minutes=1)
         for dep in deps:
             since = request.session.get('%s-last' % dep.name, time.mktime(start.timetuple()))
             url = "%s/stacky/watch/0/?since=%s"
@@ -110,7 +110,7 @@ def _search_uuid(deployments, uuid):
             dep_events.append(event)
         events.extend(dep_events)
     events.sort(reverse=True,
-                key=lambda x: util.timestamp_to_dt("%s %s" % (x[3], x[4])))
+                key=lambda x: util.timestamp_to_dt(x[3]))
     return events
 
 
@@ -127,7 +127,7 @@ def _search_requestid(deployments, requestid):
             dep_events.append(event)
         events.extend(dep_events)
     events.sort(reverse=True,
-                key=lambda x: util.timestamp_to_dt("%s %s" % (x[3], x[4])))
+                key=lambda x: util.timestamp_to_dt(x[3]))
     return events
 
 
@@ -141,11 +141,24 @@ def _search(deployments, field, value):
 
 @util.api_call
 @util.session_deployments
-def stacky_search(request, deployments):
+def stacky_search(request, deployments=None):
     if request.method == 'GET':
         field = request.GET.get('field')
         value = request.GET.get('value')
         events = _search(deployments, field, value)
         template = loader.get_template('api/stacky_search.html')
         context = RequestContext(request, {'events': events})
+        return template.render(context)
+
+
+
+@util.api_call
+def stacky_show(request, deployment, id):
+    if request.method == 'GET':
+        dep = models.Deployment.objects.get(name=deployment)
+        url = "%s/stacky/show/%s" % (dep.url, id)
+        resp = requests.get(url)
+        template = loader.get_template('api/stacky_show.html')
+        data = {'json': resp.json[-2], 'deployment': deployment, 'id': id}
+        context = RequestContext(request, data)
         return template.render(context)

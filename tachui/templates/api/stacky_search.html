@@ -1,7 +1,7 @@
 {% for event in events %}
-    <tr{% if event.2 == 'E' %} class="error"{% endif %}>
+    <tr{% if event.2 == 'E' %} class="error"{% endif %} id="s_{{ event.0 }}_{{ event.1 }}">
         <td>{{ event.0 }}</td>
-        <td>{{ event.1 }}</td>
+        <td><a href="#" onclick="show_event('{{ event.0 }}', '{{ event.1 }}')">{{ event.1 }}</a></td>
         <td>{{ event.3 }}</td>
         <td>{{ event.4 }}</td>
         <td>{{ event.5 }}</td>
