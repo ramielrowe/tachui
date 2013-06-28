@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.template import RequestContext
 
+from tachui import api
 from tachui import models
 from tachui import util
 
@@ -25,6 +26,16 @@ def index(request, deployments=None):
 def events(request, deployments=None):
     template = loader.get_template('events.html')
     context = RequestContext(request, context_data('events'))
+    return HttpResponse(template.render(context))
+
+
+@util.session_deployments
+def reports(request, deployments=None):
+    reports = api.list_reports(deployments)
+    template = loader.get_template('reports.html')
+    data = context_data('reports')
+    data['reports'] = reports
+    context = RequestContext(request, data)
     return HttpResponse(template.render(context))
 
 

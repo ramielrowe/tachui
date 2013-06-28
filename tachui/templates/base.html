@@ -32,6 +32,15 @@
             padding-top: 2px;
             padding-bottom: 2px;
         }
+        #reports_table_container {
+            height: 750px;
+            overflow: auto;
+            display: block;
+        }
+        #reports_table thead tr td, #reports_table tbody tr td {
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +62,7 @@
                     <ul class="nav">
                         <li{% if nav.page == 'index' %} class="active"{% endif %}><a href="{% url 'tachui.views.index' %}">Home</a></li>
                         <li{% if nav.page == 'events' %} class="active"{% endif %}><a href="{% url 'tachui.views.events' %}">Events</a></li>
+                        <li{% if nav.page == 'reports' %} class="active"{% endif %}><a href="{% url 'tachui.views.reports' %}">Reports</a></li>
                         <li{% if nav.page == 'settings' %} class="active"{% endif %}><a href="{% url 'tachui.views.settings' %}">Settings</a></li>
                     </ul>
                 </div>

@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^admin', include(admin.site.urls)),
     url(r'^$', 'tachui.views.index', name='index'),
     url(r'^events', 'tachui.views.events', name='events'),
+    url(r'^reports', 'tachui.views.reports', name='reports'),
     url(r'^settings$', 'tachui.views.settings', name='settings'),
 
     url(r'^api$', 'tachui.api.index', name='api_index'),

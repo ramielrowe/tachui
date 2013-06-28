@@ -20,7 +20,7 @@ def _create_deployment(request):
     pass
 
 
-def _list_deployments(request):
+def list_deployments(request):
     deployments = models.Deployment.objects.all()
     resp = [model_to_dict(x) for x in deployments]
     return {"deployments": resp}
@@ -47,24 +47,30 @@ def deployments(request):
     if request.method == 'PUT':
         return _update_deployment(request)
     elif request.method == 'GET':
-        return _list_deployments(request)
+        return list_deployments(request)
     elif request.method == 'DELETE':
         return _delete_deployment(request)
 
-@util.api_call
-@util.session_deployments
-def stacky_reports(request, deployments=None):
-    reports = []
+
+def list_reports(deployments):
+    dep_reports = []
     count = 0
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
         url = "%s/stacky/reports"
-        if count == 0:
-            reports.extend(requests.get(url % dep.url).json)
-        else:
-            reports.extend(requests.get(url % dep.url).json[1:])
+        reports = requests.get(url % dep.url).json[1:]
+        for report in reports:
+            dep_report = [dep.name]
+            dep_report.extend(report)
+            dep_reports.append(dep_report)
         count += 1
-    return reports
+    dep_reports.sort(reverse=True, key=lambda x: x[5])
+    return dep_reports
+
+@util.api_call
+@util.session_deployments
+def stacky_reports(request, deployments=None):
+    return list_reports(deployments)
 
 
 @util.api_call

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+
+
+<div class="span12 text-center">
+
+<legend>Reports</legend>
+<div id="reports_table_container" class="container">
+<table id="reports_table" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <td>Loc</td>
+            <td>ID</td>
+            <td>Start</td>
+            <td>End</td>
+            <td>Created</td>
+            <td>Name</td>
+            <td>Version</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+            <tr>
+               <td>{{ report.0 }}</td>
+               <td>{{ report.1 }}</td>
+               <td>{{ report.2 }}</td>
+               <td>{{ report.3 }}</td>
+               <td>{{ report.4 }}</td>
+               <td>{{ report.5 }}</td>
+               <td>{{ report.6 }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}
