@@ -92,18 +92,24 @@ function toggle_watch_size(){
     $('#watch_table_container').toggleClass('expanded')
 }
 
-function do_search(){
-    var field = $('#search_form_field').val().trim();
-    var value = $('#search_form_value').val().trim();
+function do_search_args(field, value){
+    field = field.trim();
+    value = value.trim();
     $.ajax({
         type: "GET",
         url: "api/stacky/search",
         data: {'field': field, 'value': value},
         dataType: "html"
     }).done(function( msg ) {
-            var search_table = $('#search_table tbody')
+            var search_table = $('#search_table tbody');
             search_table.html(msg)
         });
+}
+
+function do_search(){
+    var field = $('#search_form_field').val().trim();
+    var value = $('#search_form_value').val().trim();
+    do_search_args(field, value);
 }
 
 function show_event(loc, id){
