@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     url(r'^api/deployments$', 'tachui.api.deployments', name='api_deployments'),
     url(r'^api/stacky/reports', 'tachui.api.stacky_reports', name='api_deployments'),
     url(r'^api/stacky/watch', 'tachui.api.stacky_watch', name='api_deployments'),
+    url(r'^api/stacky/search', 'tachui.api.stacky_search', name='api_deployments'),
 )

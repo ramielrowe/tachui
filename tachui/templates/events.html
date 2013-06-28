@@ -2,9 +2,21 @@
 
 {% block body %}
 
-<button type="button" onClick="start_watch()">Start</button>
-<button type="button" onClick="stop_watch()">Stop</button>
-<button type="button" onClick="toggle_watch_size()">Expand/Shrink</button>
+
+<div class="span2">
+<div class="well sidebar-nav">
+<ul class="nav nav-list">
+<li class="nav-header">Watch</li>
+<li><button type="button" class="btn" onClick="clear_last_watch(start_watch)">Start</button></li>
+<li><button type="button" class="btn" onClick="start_watch()">Restart</button></li>
+<li><button type="button" class="btn" onClick="stop_watch()">Stop</button></li>
+<li><button type="button" class="btn" onClick="toggle_watch_size()">Expand/Shrink</button></li>
+</ul>
+</div><!--/.well -->
+</div><!--/span-->
+<div class="span10">
+
+<legend>Watch</legend>
 <div id="watch_table_container" class="container">
 <table id="watch_table" class="table table-bordered table-striped">
     <thead>
@@ -23,6 +35,41 @@
     </tbody>
 </table>
 </div>
-<script type="text/javascript">clear_last_watch(start_watch)</script>
+<!--<script type="text/javascript">clear_last_watch(start_watch)</script>-->
+<div>
+<form id="search_form" class="form-inline">
+    <legend>Search</legend>
+    <div class="input-append">
+        <select id="search_form_field" name="field" class="input-small">
+            <option>UUID</option>
+        </select>
+        <input id="search_form_value" type="text" name="value" class="input-large">
+        <button type="button" class="btn btn-primary" onclick="do_search()">Search</button>
+    </div>
+</form>
+</div>
+<div id="search_table_container" class="container">
+<table id="search_table" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <td>Loc</td>
+            <td>ID</td>
+            <td>Datetime</td>
+            <td>Deployment</td>
+            <td>Event</td>
+            <td>Host</td>
+            <td>State</td>
+            <td>State'</td>
+            <td>Task</td>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+</div>
+
+
+</div><!--/span-->
 
 {% endblock %}

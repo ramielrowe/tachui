@@ -2,7 +2,7 @@
 
 {% block body %}
 
-
+<div class="span12 text-center">
 <form action="{% url 'tachui.views.settings' %}" method="POST">
     {%  csrf_token %}
     <label for="session_deployments">Select Deployments</label>
@@ -11,8 +11,9 @@
         <option{% if dep.name in selected_deployments %} selected{% endif %}>{{ dep.name }}</option>
     {% endfor %}
     </select><br />
-    <button type="submit">Save</button>
-    <button type="button" onclick="clear_session(true);">Clear</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-warning" onclick="clear_session(true);">Clear</button>
 </form>
+</div>
 
 {% endblock %}
