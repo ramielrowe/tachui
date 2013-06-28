@@ -20,6 +20,14 @@ def index(request, deployments=None):
     context = RequestContext(request, context_data('index'))
     return HttpResponse(template.render(context))
 
+
+@util.session_deployments
+def events(request, deployments=None):
+    template = loader.get_template('events.html')
+    context = RequestContext(request, context_data('events'))
+    return HttpResponse(template.render(context))
+
+
 @util.session_deployments
 def settings(request, deployments=None):
 

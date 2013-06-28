@@ -38,9 +38,38 @@ function clear_session(do_refresh){
     }).done(function( msg ) {
         alert( "Cleared" );
         if(do_refresh){
-            refresh()
+            refresh();
         }
     });
+}
+
+function clear_last_watch(func){
+    $.ajax({
+        type: "DELETE",
+        url: "api/stacky/watch",
+        dataType: "html"
+    }).done(function( msg ) {
+        if(func){
+            func()
+        }
+    });
+}
+
+function stacky_watch(){
+
+    $.ajax({
+        type: "GET",
+        url: "api/stacky/watch",
+        dataType: "html"
+    }).done(function( msg ) {
+            $('#watch_table tbody').prepend(msg);
+            $('#watch_table tbody').children("tr:gt(30)").remove()
+        });
+
+}
+
+function start_watch(){
+    window.setInterval(stacky_watch, 5000);
 }
 
 function refresh(){

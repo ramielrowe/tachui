@@ -1,6 +1,10 @@
-import requests
+import datetime
+import time
 
 from django.forms.models import model_to_dict
+from django.template import loader
+from django.template import RequestContext
+import requests
 
 from tachui import models
 from tachui import util
@@ -52,8 +56,8 @@ def deployments(request):
 def stacky_reports(request, deployments=None):
     reports = []
     count = 0
-    for name in deployments:
-        dep = models.Deployment.objects.get(name=name)
+    deps = models.Deployment.objects.filter(name__in=deployments)
+    for dep in deps:
         url = "%s/stacky/reports"
         if count == 0:
             reports.extend(requests.get(url % dep.url).json)
@@ -61,3 +65,33 @@ def stacky_reports(request, deployments=None):
             reports.extend(requests.get(url % dep.url).json[1:])
         count += 1
     return reports
+
+
+@util.api_call
+@util.session_deployments
+def stacky_watch(request, deployments):
+    if request.method == 'DELETE':
+        start = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        for name in deployments:
+            request.session['%s-last' % name] = time.mktime(start.timetuple())
+
+    if request.method == 'GET':
+        events = []
+        deps = models.Deployment.objects.filter(name__in=deployments)
+        start = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        for dep in deps:
+            since = request.session.get('%s-last' % dep.name, time.mktime(start.timetuple()))
+            url = "%s/stacky/watch/0/?since=%s"
+            resp = requests.get(url % (dep.url, since))
+            dep_events = []
+            for x in resp.json[1]:
+                event = [dep.name]
+                event.extend(x)
+                dep_events.append(event)
+            events.extend(dep_events)
+            request.session['%s-last' % dep.name] = resp.json[-1]
+        events.sort(reverse=True,
+                    key=lambda x: util.timestamp_to_dt("%s %s" % (x[3], x[4])))
+        template = loader.get_template('api/stacky_watch.html')
+        context = RequestContext(request, {'events': events})
+        return template.render(context)

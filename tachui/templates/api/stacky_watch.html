@@ -1,0 +1,11 @@
+{% for event in events %}
+    <tr{% if event.1 == 'E' %} class="error"{% endif %}>
+        <td>{{ event.0 }}</td>
+        <td>{{ event.1 }}</td>
+        <td>{{ event.3 }}</td>
+        <td>{{ event.4 }}</td>
+        <td>{{ event.5 }}</td>
+        <td>{{ event.6 }}</td>
+        <td>{{ event.7 }}</td>
+    </tr>
+{% endfor %}
