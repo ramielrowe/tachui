@@ -68,10 +68,26 @@ function stacky_watch(){
 
 }
 
+var watch_interval_id = 0;
+
 function start_watch(){
-    window.setInterval(stacky_watch, 5000);
+    if(watch_interval_id != 0){
+        window.clearInterval(watch_interval_id);
+    }
+    watch_interval_id = window.setInterval(stacky_watch, 5000);
+}
+
+function stop_watch(){
+    if(watch_interval_id != 0){
+        window.clearInterval(watch_interval_id);
+        watch_interval_id = 0;
+    }
 }
 
 function refresh(){
     document.location.reload()
+}
+
+function toggle_watch_size(){
+    $('#watch_table_container').toggleClass('expanded')
 }

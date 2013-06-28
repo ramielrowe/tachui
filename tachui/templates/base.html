@@ -11,8 +11,13 @@
         body {
             padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
         }
-        #watch_table_container {
+        #watch_table_container:not(.expanded){
             height: 300px;
+            overflow: auto;
+            display: block;
+        }
+        #watch_table_container .expanded{
+            height: 600px;
             overflow: auto;
             display: block;
         }
