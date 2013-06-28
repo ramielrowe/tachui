@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+
+<form action="{% url 'tachui.views.settings' %}" method="POST">
+    {%  csrf_token %}
+    <label for="session_deployments">Select Deployments</label>
+    <select id="session_deployments" name="deployments" size="10" multiple>
+    {% for dep in all_deployments %}
+        <option{% if dep.name in selected_deployments %} selected{% endif %}>{{ dep.name }}</option>
+    {% endfor %}
+    </select><br />
+    <button type="submit">Save</button>
+    <button type="button" onclick="clear_session(true);">Clear</button>
+</form>
+
+{% endblock %}
