@@ -114,21 +114,38 @@ def _search_uuid(deployments, uuid):
     return events
 
 
+def _search_requestid(deployments, requestid):
+    events = []
+    deps = models.Deployment.objects.filter(name__in=deployments)
+    for dep in deps:
+        url = "%s/stacky/request/?request_id=%s"
+        resp = requests.get(url % (dep.url, requestid))
+        dep_events = []
+        for x in resp.json[1:]:
+            event = [dep.name]
+            event.extend(x)
+            dep_events.append(event)
+        events.extend(dep_events)
+    events.sort(reverse=True,
+                key=lambda x: util.timestamp_to_dt("%s %s" % (x[3], x[4])))
+    return events
+
+
 def _search(deployments, field, value):
     if field == 'UUID':
         return _search_uuid(deployments, value)
+    elif field == 'RequestId':
+        return _search_requestid(deployments, value)
+
 
 
 @util.api_call
 @util.session_deployments
 def stacky_search(request, deployments):
-
     if request.method == 'GET':
         field = request.GET.get('field')
         value = request.GET.get('value')
-        print field
-        print value
         events = _search(deployments, field, value)
-        template = loader.get_template('api/stacky_uuid.html')
+        template = loader.get_template('api/stacky_search.html')
         context = RequestContext(request, {'events': events})
         return template.render(context)

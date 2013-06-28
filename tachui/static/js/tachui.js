@@ -103,6 +103,6 @@ function do_search(){
         dataType: "html"
     }).done(function( msg ) {
             var search_table = $('#search_table tbody')
-            search_table.contents(msg)
+            search_table.html(msg)
         });
 }
