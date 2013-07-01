@@ -10,6 +10,14 @@ from tachui import models
 from tachui import util
 
 
+def _json(request):
+    j = request.json
+    if callable(j):
+        return j()
+    else:
+        return j
+
+
 @util.api_call
 @util.session_deployments
 def index(request, deployments=None):
@@ -58,7 +66,7 @@ def list_reports(deployments):
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
         url = "%s/stacky/reports"
-        reports = requests.get(url % dep.url).json[1:]
+        reports = _json(requests.get(url % dep.url))[1:]
         for report in reports:
             dep_report = [dep.name]
             dep_report.extend(report)
@@ -90,12 +98,12 @@ def stacky_watch(request, deployments=None):
             url = "%s/stacky/watch/0/?since=%s"
             resp = requests.get(url % (dep.url, since))
             dep_events = []
-            for x in resp.json[1]:
+            for x in _json(resp)[1]:
                 event = [dep.name]
                 event.extend(x)
                 dep_events.append(event)
             events.extend(dep_events)
-            request.session['%s-last' % dep.name] = resp.json[-1]
+            request.session['%s-last' % dep.name] = _json(resp)[-1]
         events.sort(reverse=True,
                     key=lambda x: util.timestamp_to_dt("%s %s" % (x[3], x[4])))
         template = loader.get_template('api/stacky_watch.html')
@@ -110,7 +118,7 @@ def _search_uuid(deployments, uuid):
         url = "%s/stacky/uuid/?uuid=%s"
         resp = requests.get(url % (dep.url, uuid))
         dep_events = []
-        for x in resp.json[1:]:
+        for x in _json(resp)[1:]:
             event = [dep.name]
             event.extend(x)
             dep_events.append(event)
@@ -127,7 +135,7 @@ def _search_requestid(deployments, requestid):
         url = "%s/stacky/request/?request_id=%s"
         resp = requests.get(url % (dep.url, requestid))
         dep_events = []
-        for x in resp.json[1:]:
+        for x in json(resp)[1:]:
             event = [dep.name]
             event.extend(x)
             dep_events.append(event)
@@ -165,6 +173,6 @@ def stacky_show(request, deployment, id):
         url = "%s/stacky/show/%s" % (dep.url, id)
         resp = requests.get(url)
         template = loader.get_template('api/stacky_show.html')
-        data = {'json': resp.json[-2], 'deployment': deployment, 'id': id}
+        data = {'json': _json(resp)[-2], 'deployment': deployment, 'id': id}
         context = RequestContext(request, data)
         return template.render(context)
