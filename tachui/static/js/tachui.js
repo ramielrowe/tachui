@@ -124,6 +124,6 @@ function show_event(loc, id){
     }).done(function( msg ) {
             var row = $('#s_'+loc+'_'+id);
             row.after(msg)
-            $("html, body").animate({ scrollTop: $('#s_'+loc+'_'+id+'_show').offset().top }, 500);
+            $("html, body").animate({ scrollTop: $('#s_'+loc+'_'+id+'_show').offset().top - 75 }, 500);
         });
 }
