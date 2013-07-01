@@ -135,7 +135,7 @@ def _search_requestid(deployments, requestid):
         url = "%s/stacky/request/?request_id=%s"
         resp = requests.get(url % (dep.url, requestid))
         dep_events = []
-        for x in json(resp)[1:]:
+        for x in _json(resp)[1:]:
             event = [dep.name]
             event.extend(x)
             dep_events.append(event)
