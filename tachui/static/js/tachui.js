@@ -112,6 +112,10 @@ function do_search(){
     do_search_args(field, value);
 }
 
+function close_show(loc, id){
+    $("#s_"+loc+"_"+id+"_show").remove()
+}
+
 function show_event(loc, id){
     $.ajax({
         type: "GET",
