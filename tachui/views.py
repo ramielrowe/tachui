@@ -45,7 +45,6 @@ def settings(request, deployments=None):
     if request.method == 'POST':
         deployments = request.POST.getlist('deployments')
         request.session['deployments'] = deployments
-        print deployments
 
     template = loader.get_template('settings.html')
     data = context_data('settings')

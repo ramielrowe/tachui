@@ -43,13 +43,11 @@ def _update_deployment(request):
 
 @util.api_call
 def session(request):
-    print request.META['HTTP_ACCEPT']
     if request.method == 'DELETE':
         request.session.flush()
 
 @util.api_call
 def deployments(request):
-    print request.META['HTTP_ACCEPT']
     if request.method == 'POST':
         return _create_deployment(request)
     if request.method == 'PUT':
