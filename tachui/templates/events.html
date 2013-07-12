@@ -36,7 +36,6 @@
 </table>
 </div>
 <!--<script type="text/javascript">clear_last_watch(start_watch)</script>-->
-<div>
 <form id="search_form" class="form-inline">
     <legend>Search</legend>
     <div class="input-append">
@@ -48,8 +47,11 @@
         <button type="button" class="btn btn-primary" onclick="do_search()">Search</button>
     </div>
 </form>
-</div>
 <div id="search_table_container" class="container">
+<div class="progress progress-striped active" id="search_progress">
+    <div class="bar" style="width: 100%;"></div>
+</div>
+<script type="text/javascript">$("#search_progress").hide();</script>
 <table id="search_table" class="table table-bordered table-striped">
     <thead>
         <tr>

@@ -93,17 +93,23 @@ function toggle_watch_size(){
 }
 
 function do_search_args(field, value){
+    $("#search_progress").show();
     field = field.trim();
     value = value.trim();
-    $.ajax({
+    var async = $.ajax({
         type: "GET",
         url: "api/stacky/search",
         data: {'field': field, 'value': value},
         dataType: "html"
-    }).done(function( msg ) {
-            var search_table = $('#search_table tbody');
-            search_table.html(msg)
-        });
+    });
+    async.done(function( msg ) {
+        $("#search_progress").hide();
+        var search_table = $('#search_table tbody');
+        search_table.html(msg)
+    });
+    async.fail(function( msg ){
+        $("#search_progress").hide();
+    });
 }
 
 function do_search(){
@@ -117,13 +123,19 @@ function close_show(loc, id){
 }
 
 function show_event(loc, id){
-    $.ajax({
+    $("#search_progress").show();
+    var async = $.ajax({
         type: "GET",
         url: "api/stacky/show/"+loc+"/"+id,
         dataType: "html"
-    }).done(function( msg ) {
-            var row = $('#s_'+loc+'_'+id);
-            row.after(msg)
-            $("html, body").animate({ scrollTop: $('#s_'+loc+'_'+id+'_show').offset().top - 75 }, 500);
-        });
+    });
+    async.done(function( msg ) {
+        $("#search_progress").hide();
+        var row = $('#s_'+loc+'_'+id);
+        row.after(msg)
+        $("html, body").animate({ scrollTop: $('#s_'+loc+'_'+id+'_show').offset().top - 75 }, 500);
+    });
+    async.fail(function( msg ){
+        $("#search_progress").hide();
+    });
 }
