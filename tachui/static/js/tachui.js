@@ -92,13 +92,13 @@ function toggle_watch_size(){
     $('#watch_table_container').toggleClass('expanded')
 }
 
-function do_search_args(field, value){
+function do_search_args(service, field, value){
     $("#search_progress").show();
     field = field.trim();
     value = value.trim();
     var async = $.ajax({
         type: "GET",
-        url: "api/stacky/search",
+        url: "api/stacky/search/"+service,
         data: {'field': field, 'value': value},
         dataType: "html"
     });
@@ -113,9 +113,10 @@ function do_search_args(field, value){
 }
 
 function do_search(){
+    var service = $('#search_form_service').val().trim();
     var field = $('#search_form_field').val().trim();
     var value = $('#search_form_value').val().trim();
-    do_search_args(field, value);
+    do_search_args(service, field, value);
 }
 
 function close_show(loc, id){

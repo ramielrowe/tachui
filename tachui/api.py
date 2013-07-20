@@ -109,12 +109,13 @@ def stacky_watch(request, deployments=None):
         return template.render(context)
 
 
-def _search_uuid(deployments, uuid):
+def _search_uuid(deployments, service, uuid):
     events = []
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
-        url = "%s/stacky/uuid/?uuid=%s"
-        resp = requests.get(url % (dep.url, uuid))
+        url = "%s/stacky/uuid/%s/?uuid=%s"
+        print url % (dep.url, service, uuid)
+        resp = requests.get(url % (dep.url, service, uuid))
         dep_events = []
         for x in _json(resp)[1:]:
             event = [dep.name]
@@ -126,12 +127,12 @@ def _search_uuid(deployments, uuid):
     return events
 
 
-def _search_requestid(deployments, requestid):
+def _search_requestid(deployments, service, requestid):
     events = []
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
-        url = "%s/stacky/request/?request_id=%s"
-        resp = requests.get(url % (dep.url, requestid))
+        url = "%s/stacky/request/%s/?request_id=%s"
+        resp = requests.get(url % (dep.url, service, requestid))
         dep_events = []
         for x in _json(resp)[1:]:
             event = [dep.name]
@@ -143,21 +144,21 @@ def _search_requestid(deployments, requestid):
     return events
 
 
-def _search(deployments, field, value):
+def _search(deployments, service, field, value):
     if field == 'UUID':
-        return _search_uuid(deployments, value)
+        return _search_uuid(deployments, service, value)
     elif field == 'RequestId':
-        return _search_requestid(deployments, value)
+        return _search_requestid(deployments, service, value)
 
 
 
 @util.api_call
 @util.session_deployments
-def stacky_search(request, deployments=None):
+def stacky_search(request, service, deployments=None):
     if request.method == 'GET':
         field = request.GET.get('field')
         value = request.GET.get('value')
-        events = _search(deployments, field, value)
+        events = _search(deployments, service, field, value)
         template = loader.get_template('api/stacky_search.html')
         context = RequestContext(request, {'events': events})
         return template.render(context)
