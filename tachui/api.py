@@ -114,7 +114,6 @@ def _search_uuid(deployments, service, uuid):
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
         url = "%s/stacky/uuid/%s/?uuid=%s"
-        print url % (dep.url, service, uuid)
         resp = requests.get(url % (dep.url, service, uuid))
         dep_events = []
         for x in _json(resp)[1:]:
@@ -144,17 +143,39 @@ def _search_requestid(deployments, service, requestid):
     return events
 
 
+def _search_by_field(deployments, service, field, value):
+    events = []
+    deps = models.Deployment.objects.filter(name__in=deployments)
+    for dep in deps:
+        url = "%s/stacky/search/%s/?field=%s&value=%s"
+        print url % (dep.url, service, field, value)
+        resp = requests.get(url % (dep.url, service, field, value))
+        dep_events = []
+        for x in _json(resp)[1:]:
+            event = [dep.name]
+            event.extend(x)
+            dep_events.append(event)
+        events.extend(dep_events)
+    events.sort(reverse=True,
+                key=lambda x: util.timestamp_to_dt(x[3]))
+    return events
+
+
 def _search(deployments, service, field, value):
     if field == 'UUID':
         return _search_uuid(deployments, service, value)
     elif field == 'RequestId':
         return _search_requestid(deployments, service, value)
+    else:
+        if field == 'tenant' and service == 'glance':
+            field = 'owner'
+        return _search_by_field(deployments, service, field, value)
 
 
 
 @util.api_call
 @util.session_deployments
-def stacky_search(request, service, deployments=None):
+def stacky_search(request, service='nova', deployments=None):
     if request.method == 'GET':
         field = request.GET.get('field')
         value = request.GET.get('value')
