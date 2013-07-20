@@ -19,5 +19,6 @@ urlpatterns = patterns('',
     url(r'^api/stacky/watch', 'tachui.api.stacky_watch', name='api_stacky_watch'),
     url(r'^api/stacky/search/(?P<service>.+)', 'tachui.api.stacky_search', name='api_stacky_search'),
     url(r'^api/stacky/search', 'tachui.api.stacky_search', name='api_stacky_search'),
-    url(r'^api/stacky/show/(?P<deployment>.+)/(?P<id>\w+)', 'tachui.api.stacky_show', name='api_stacky_show'),
+    url(r'^api/stacky/show/(?P<deployment>.+)/(?P<service>.+)/(?P<id>\w+)',
+        'tachui.api.stacky_show', name='api_stacky_show'),
 )

@@ -172,7 +172,7 @@ def _search(deployments, service, field, value):
 
         if field == 'tenant' and service == 'glance':
             field = 'owner'
-        
+
         return _search_by_field(deployments, service, field, value)
 
 
@@ -185,16 +185,20 @@ def stacky_search(request, service='nova', deployments=None):
         value = request.GET.get('value')
         events = _search(deployments, service, field, value)
         template = loader.get_template('api/stacky_search.html')
-        context = RequestContext(request, {'events': events})
+        context_dict = {
+            'service': service,
+            'events': events
+        }
+        context = RequestContext(request, context_dict)
         return template.render(context)
 
 
 
 @util.api_call
-def stacky_show(request, deployment, id):
+def stacky_show(request, deployment, service, id):
     if request.method == 'GET':
         dep = models.Deployment.objects.get(name=deployment)
-        url = "%s/stacky/show/%s" % (dep.url, id)
+        url = "%s/stacky/show/%s/%s" % (dep.url, service, id)
         resp = requests.get(url)
         template = loader.get_template('api/stacky_show.html')
         data = {'json': _json(resp)[-2], 'deployment': deployment, 'id': id}

@@ -123,11 +123,11 @@ function close_show(loc, id){
     $("#s_"+loc+"_"+id+"_show").remove()
 }
 
-function show_event(loc, id){
+function show_event(loc, service, id){
     $("#search_progress").show();
     var async = $.ajax({
         type: "GET",
-        url: "api/stacky/show/"+loc+"/"+id,
+        url: "api/stacky/show/"+loc+"/"+service+"/"+id,
         dataType: "html"
     });
     async.done(function( msg ) {
