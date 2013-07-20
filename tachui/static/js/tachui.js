@@ -54,11 +54,13 @@ function clear_last_watch(func){
     });
 }
 
+var watch_service = 'nova'
+
 function stacky_watch(){
 
     $.ajax({
         type: "GET",
-        url: "api/stacky/watch",
+        url: "api/stacky/watch/"+watch_service,
         dataType: "html"
     }).done(function( msg ) {
             var watch_table = $('#watch_table tbody')
@@ -71,6 +73,11 @@ function stacky_watch(){
 var watch_interval_id = 0;
 
 function start_watch(){
+    var service = $('#watch_form_service').val().trim();
+    if(watch_service != service){
+        clear_last_watch();
+    }
+    watch_service = service;
     if(watch_interval_id != 0){
         window.clearInterval(watch_interval_id);
     }

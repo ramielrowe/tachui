@@ -81,20 +81,22 @@ def stacky_reports(request, deployments=None):
 
 @util.api_call
 @util.session_deployments
-def stacky_watch(request, deployments=None):
+def stacky_watch(request, service='nova', deployments=None):
     if request.method == 'DELETE':
-        start = datetime.datetime.now() - datetime.timedelta(minutes=1)
+        start = datetime.datetime.now() - datetime.timedelta(minutes=30)
         for name in deployments:
             request.session['%s-last' % name] = time.mktime(start.timetuple())
+        print 'delete'
 
     if request.method == 'GET':
         events = []
         deps = models.Deployment.objects.filter(name__in=deployments)
-        start = datetime.datetime.now() - datetime.timedelta(minutes=1)
+        start = datetime.datetime.now() - datetime.timedelta(minutes=30)
         for dep in deps:
             since = request.session.get('%s-last' % dep.name, time.mktime(start.timetuple()))
-            url = "%s/stacky/watch/0/?since=%s"
-            resp = requests.get(url % (dep.url, since))
+            url = "%s/stacky/watch/0/%s/?since=%s"
+            print url % (dep.url, service, since)
+            resp = requests.get(url % (dep.url, service, since))
             dep_events = []
             for x in _json(resp)[1]:
                 event = [dep.name]
@@ -105,7 +107,11 @@ def stacky_watch(request, deployments=None):
         events.sort(reverse=True,
                     key=lambda x: util.timestamp_to_dt("%s %s" % (x[3], x[4])))
         template = loader.get_template('api/stacky_watch.html')
-        context = RequestContext(request, {'events': events})
+        context_dict = {
+            'service': service,
+            'events': events
+        }
+        context = RequestContext(request, context_dict)
         return template.render(context)
 
 

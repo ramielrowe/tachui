@@ -7,6 +7,12 @@
 <div class="well sidebar-nav">
 <ul class="nav nav-list">
 <li class="nav-header">Watch</li>
+<li>
+    <select id="watch_form_service" name="service" class="input-small">
+        <option value="nova">Nova</option>
+        <option value="glance">Glance</option>
+    </select>
+</li>
 <li><button type="button" class="btn" onClick="clear_last_watch(start_watch)">Start</button></li>
 <li><button type="button" class="btn" onClick="start_watch()">Restart</button></li>
 <li><button type="button" class="btn" onClick="stop_watch()">Stop</button></li>
