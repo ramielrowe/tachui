@@ -54,11 +54,13 @@ function clear_last_watch(func){
     });
 }
 
+var watch_service = 'nova'
+
 function stacky_watch(){
 
     $.ajax({
         type: "GET",
-        url: "api/stacky/watch",
+        url: "api/stacky/watch/"+watch_service,
         dataType: "html"
     }).done(function( msg ) {
             var watch_table = $('#watch_table tbody')
@@ -71,6 +73,11 @@ function stacky_watch(){
 var watch_interval_id = 0;
 
 function start_watch(){
+    var service = $('#watch_form_service').val().trim();
+    if(watch_service != service){
+        clear_last_watch();
+    }
+    watch_service = service;
     if(watch_interval_id != 0){
         window.clearInterval(watch_interval_id);
     }
@@ -92,13 +99,13 @@ function toggle_watch_size(){
     $('#watch_table_container').toggleClass('expanded')
 }
 
-function do_search_args(field, value){
+function do_search_args(service, field, value){
     $("#search_progress").show();
     field = field.trim();
     value = value.trim();
     var async = $.ajax({
         type: "GET",
-        url: "api/stacky/search",
+        url: "api/stacky/search/"+service,
         data: {'field': field, 'value': value},
         dataType: "html"
     });
@@ -113,20 +120,21 @@ function do_search_args(field, value){
 }
 
 function do_search(){
+    var service = $('#search_form_service').val().trim();
     var field = $('#search_form_field').val().trim();
     var value = $('#search_form_value').val().trim();
-    do_search_args(field, value);
+    do_search_args(service, field, value);
 }
 
 function close_show(loc, id){
     $("#s_"+loc+"_"+id+"_show").remove()
 }
 
-function show_event(loc, id){
+function show_event(loc, service, id){
     $("#search_progress").show();
     var async = $.ajax({
         type: "GET",
-        url: "api/stacky/show/"+loc+"/"+id,
+        url: "api/stacky/show/"+loc+"/"+service+"/"+id,
         dataType: "html"
     });
     async.done(function( msg ) {

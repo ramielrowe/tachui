@@ -1,11 +1,11 @@
 {% for event in events %}
     <tr{% if event.2 == 'E' %} class="error"{% endif %} id="s_{{ event.0 }}_{{ event.1 }}">
         <td>{{ event.0 }}</td>
-        <td><a onclick="show_event('{{ event.0 }}', '{{ event.1 }}')" href="javascript:void(0)">{{ event.1 }}</a></td>
+        <td><a onclick="show_event('{{ event.0 }}', '{{ service }}', '{{ event.1 }}')" href="javascript:void(0)">{{ event.1 }}</a></td>
         <td>{{ event.3 }}</td>
         <td>{{ event.4 }}</td>
-        <td>{{ event.5 }}</td>
-        <td>{{ event.6 }}</td>
+        <td><a onclick="do_search_args('{{ service }}', 'event', '{{ event.5 }}')" href="javascript:void(0)">{{ event.5 }}</a></td>
+        <td><a onclick="do_search_args('{{ service }}', 'host', '{{ event.6 }}')" href="javascript:void(0)">{{ event.6 }}</a></td>
         <td>{{ event.7 }}</td>
         <td>{{ event.8 }}</td>
         <td>{{ event.9 }}</td>

@@ -81,20 +81,22 @@ def stacky_reports(request, deployments=None):
 
 @util.api_call
 @util.session_deployments
-def stacky_watch(request, deployments=None):
+def stacky_watch(request, service='nova', deployments=None):
     if request.method == 'DELETE':
-        start = datetime.datetime.now() - datetime.timedelta(minutes=1)
+        start = datetime.datetime.now() - datetime.timedelta(minutes=30)
         for name in deployments:
             request.session['%s-last' % name] = time.mktime(start.timetuple())
+        print 'delete'
 
     if request.method == 'GET':
         events = []
         deps = models.Deployment.objects.filter(name__in=deployments)
-        start = datetime.datetime.now() - datetime.timedelta(minutes=1)
+        start = datetime.datetime.now() - datetime.timedelta(minutes=30)
         for dep in deps:
             since = request.session.get('%s-last' % dep.name, time.mktime(start.timetuple()))
-            url = "%s/stacky/watch/0/?since=%s"
-            resp = requests.get(url % (dep.url, since))
+            url = "%s/stacky/watch/0/%s/?since=%s"
+            print url % (dep.url, service, since)
+            resp = requests.get(url % (dep.url, service, since))
             dep_events = []
             for x in _json(resp)[1]:
                 event = [dep.name]
@@ -105,16 +107,20 @@ def stacky_watch(request, deployments=None):
         events.sort(reverse=True,
                     key=lambda x: util.timestamp_to_dt("%s %s" % (x[3], x[4])))
         template = loader.get_template('api/stacky_watch.html')
-        context = RequestContext(request, {'events': events})
+        context_dict = {
+            'service': service,
+            'events': events
+        }
+        context = RequestContext(request, context_dict)
         return template.render(context)
 
 
-def _search_uuid(deployments, uuid):
+def _search_uuid(deployments, service, uuid):
     events = []
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
-        url = "%s/stacky/uuid/?uuid=%s"
-        resp = requests.get(url % (dep.url, uuid))
+        url = "%s/stacky/uuid/%s/?uuid=%s"
+        resp = requests.get(url % (dep.url, service, uuid))
         dep_events = []
         for x in _json(resp)[1:]:
             event = [dep.name]
@@ -126,12 +132,12 @@ def _search_uuid(deployments, uuid):
     return events
 
 
-def _search_requestid(deployments, requestid):
+def _search_requestid(deployments, service, requestid):
     events = []
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
-        url = "%s/stacky/request/?request_id=%s"
-        resp = requests.get(url % (dep.url, requestid))
+        url = "%s/stacky/request/%s/?request_id=%s"
+        resp = requests.get(url % (dep.url, service, requestid))
         dep_events = []
         for x in _json(resp)[1:]:
             event = [dep.name]
@@ -143,32 +149,62 @@ def _search_requestid(deployments, requestid):
     return events
 
 
-def _search(deployments, field, value):
+def _search_by_field(deployments, service, field, value):
+    events = []
+    deps = models.Deployment.objects.filter(name__in=deployments)
+    for dep in deps:
+        url = "%s/stacky/search/%s/?field=%s&value=%s"
+        print url % (dep.url, service, field, value)
+        resp = requests.get(url % (dep.url, service, field, value))
+        dep_events = []
+        for x in _json(resp)[1:]:
+            event = [dep.name]
+            event.extend(x)
+            dep_events.append(event)
+        events.extend(dep_events)
+    events.sort(reverse=True,
+                key=lambda x: util.timestamp_to_dt(x[3]))
+    return events
+
+
+def _search(deployments, service, field, value):
     if field == 'UUID':
-        return _search_uuid(deployments, value)
+        return _search_uuid(deployments, service, value)
     elif field == 'RequestId':
-        return _search_requestid(deployments, value)
+        return _search_requestid(deployments, service, value)
+    else:
+        if field == 'uuid' and service == 'nova':
+            field = 'instance'
+
+        if field == 'tenant' and service == 'glance':
+            field = 'owner'
+
+        return _search_by_field(deployments, service, field, value)
 
 
 
 @util.api_call
 @util.session_deployments
-def stacky_search(request, deployments=None):
+def stacky_search(request, service='nova', deployments=None):
     if request.method == 'GET':
         field = request.GET.get('field')
         value = request.GET.get('value')
-        events = _search(deployments, field, value)
+        events = _search(deployments, service, field, value)
         template = loader.get_template('api/stacky_search.html')
-        context = RequestContext(request, {'events': events})
+        context_dict = {
+            'service': service,
+            'events': events
+        }
+        context = RequestContext(request, context_dict)
         return template.render(context)
 
 
 
 @util.api_call
-def stacky_show(request, deployment, id):
+def stacky_show(request, deployment, service, id):
     if request.method == 'GET':
         dep = models.Deployment.objects.get(name=deployment)
-        url = "%s/stacky/show/%s" % (dep.url, id)
+        url = "%s/stacky/show/%s/%s" % (dep.url, service, id)
         resp = requests.get(url)
         template = loader.get_template('api/stacky_show.html')
         data = {'json': _json(resp)[-2], 'deployment': deployment, 'id': id}
