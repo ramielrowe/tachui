@@ -173,7 +173,7 @@ def _search(deployments, service, field, value):
     elif field == 'RequestId':
         return _search_requestid(deployments, service, value)
     else:
-        if field == 'uuid' and service == 'nova':
+        if field == 'uuid' and (service == 'nova' or service == 'generic'):
             field = 'instance'
 
         if field == 'tenant' and service == 'glance':
