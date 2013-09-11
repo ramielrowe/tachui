@@ -95,9 +95,9 @@ def stacky_watch(request, deployments=None):
         start = datetime.datetime.now() - datetime.timedelta(minutes=30)
         for dep in deps:
             since = request.session.get('%s-last' % dep.name, time.mktime(start.timetuple()))
-            url = "%s/stacky/watch/0/%s/?since=%s"
+            url = "%s/stacky/watch/0/?since=%s&service=%s"
             print url % (dep.url, service, since)
-            resp = requests.get(url % (dep.url, service, since))
+            resp = requests.get(url % (dep.url, since, service))
             dep_events = []
             for x in _json(resp)[1]:
                 event = [dep.name]
@@ -120,10 +120,10 @@ def _search_uuid(deployments, service, uuid, limit):
     events = []
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
-        url = "%s/stacky/uuid/%s/?uuid=%s"
+        url = "%s/stacky/uuid/?uuid=%s&service=%s"
         if limit:
             url += "&limit=%s" % limit
-        resp = requests.get(url % (dep.url, service, uuid))
+        resp = requests.get(url % (dep.url, uuid, service))
         dep_events = []
         for x in _json(resp)[1:]:
             event = [dep.name]
@@ -139,10 +139,10 @@ def _search_requestid(deployments, service, requestid, limit):
     events = []
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
-        url = "%s/stacky/request/%s/?request_id=%s"
+        url = "%s/stacky/request/?request_id=%s&service=%s"
         if limit:
             url += "&limit=%s" % limit
-        resp = requests.get(url % (dep.url, service, requestid))
+        resp = requests.get(url % (dep.url, requestid, service))
         dep_events = []
         for x in _json(resp)[1:]:
             event = [dep.name]
@@ -158,11 +158,11 @@ def _search_by_field(deployments, service, field, value, limit):
     events = []
     deps = models.Deployment.objects.filter(name__in=deployments)
     for dep in deps:
-        url = "%s/stacky/search/%s/?field=%s&value=%s"
+        url = "%s/stacky/search/?field=%s&value=%s&service=%s"
         if limit:
             url += "&limit=%s" % limit
         print url % (dep.url, service, field, value)
-        resp = requests.get(url % (dep.url, service, field, value))
+        resp = requests.get(url % (dep.url, field, value, service))
         dep_events = []
         for x in _json(resp)[1:]:
             event = [dep.name]
@@ -214,7 +214,7 @@ def stacky_show(request, deployment, id):
     service = request.GET.get('service', 'nova')
     if request.method == 'GET':
         dep = models.Deployment.objects.get(name=deployment)
-        url = "%s/stacky/show/%s/%s" % (dep.url, service, id)
+        url = "%s/stacky/show/%s/?service=%s" % (dep.url, id, service)
         resp = requests.get(url)
         template = loader.get_template('api/stacky_show.html')
         data = {'json': _json(resp)[-2], 'deployment': deployment, 'id': id}
