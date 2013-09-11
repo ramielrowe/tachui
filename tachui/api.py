@@ -81,7 +81,8 @@ def stacky_reports(request, deployments=None):
 
 @util.api_call
 @util.session_deployments
-def stacky_watch(request, service='nova', deployments=None):
+def stacky_watch(request, deployments=None):
+    service = request.GET.get('service', 'nova')
     if request.method == 'DELETE':
         start = datetime.datetime.now() - datetime.timedelta(minutes=30)
         for name in deployments:
@@ -191,7 +192,8 @@ def _search(deployments, service, field, value, limit):
 
 @util.api_call
 @util.session_deployments
-def stacky_search(request, service='nova', deployments=None):
+def stacky_search(request, deployments=None):
+    service = request.GET.get('service', 'nova')
     if request.method == 'GET':
         field = request.GET.get('field')
         value = request.GET.get('value')
@@ -208,7 +210,8 @@ def stacky_search(request, service='nova', deployments=None):
 
 
 @util.api_call
-def stacky_show(request, deployment, service, id):
+def stacky_show(request, deployment, id):
+    service = request.GET.get('service', 'nova')
     if request.method == 'GET':
         dep = models.Deployment.objects.get(name=deployment)
         url = "%s/stacky/show/%s/%s" % (dep.url, service, id)

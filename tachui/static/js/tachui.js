@@ -60,10 +60,11 @@ function stacky_watch(){
 
     $.ajax({
         type: "GET",
-        url: "api/stacky/watch/"+watch_service,
-        dataType: "html"
+        url: "api/stacky/watch",
+        dataType: "html",
+        data: {'service': watch_service}
     }).done(function( msg ) {
-            var watch_table = $('#watch_table tbody')
+            var watch_table = $('#watch_table tbody');
             watch_table.prepend(msg);
             watch_table.children("tr:gt(60)").remove()
         });
@@ -104,13 +105,13 @@ function do_search_args(service, field, value, limit){
     $("#search_progress").show();
     field = field.trim();
     value = value.trim();
-    data = {'field': field, 'value': value};
+    var data = {'field': field, 'value': value, 'service': service};
     if(limit != 'none'){
         data['limit'] = limit;
     }
     var async = $.ajax({
         type: "GET",
-        url: "api/stacky/search/"+service,
+        url: "api/stacky/search",
         data: data,
         dataType: "html"
     });
@@ -140,13 +141,14 @@ function show_event(loc, service, id){
     $("#search_progress").show();
     var async = $.ajax({
         type: "GET",
-        url: "api/stacky/show/"+loc+"/"+service+"/"+id,
-        dataType: "html"
+        url: "api/stacky/show/"+loc+"/"+id,
+        dataType: "html",
+        data: {'service': service}
     });
     async.done(function( msg ) {
         $("#search_progress").hide();
         var row = $('#s_'+loc+'_'+id);
-        row.after(msg)
+        row.after(msg);
         $("html, body").animate({ scrollTop: $('#s_'+loc+'_'+id+'_show').offset().top - 75 }, 500);
     });
     async.fail(function( msg ){
